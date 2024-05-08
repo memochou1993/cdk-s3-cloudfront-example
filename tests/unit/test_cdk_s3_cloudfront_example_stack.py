@@ -1,7 +1,7 @@
 import aws_cdk as core
 import aws_cdk.assertions as assertions
 
-from cdk_s3_cloudfront_example.cdk_s3_cloudfront_example_stack import CdkS3CloudfrontExampleStack
+from deployment.cdk_s3_cloudfront_example_stack import CdkS3CloudfrontExampleStack
 
 # example tests. To run these tests, uncomment this file along with the example
 # resource in cdk_s3_cloudfront_example/cdk_s3_cloudfront_example_stack.py
