@@ -1,4 +1,6 @@
-from aws_cdk import RemovalPolicy, Stack, aws_cloudfront, aws_cloudfront_origins, aws_s3
+import json
+
+from aws_cdk import RemovalPolicy, Stack, aws_cloudfront, aws_cloudfront_origins, aws_s3, aws_ssm
 from constructs import Construct
 
 
@@ -20,13 +22,6 @@ class CdkS3CloudfrontExampleStack(Stack):
             auto_delete_objects=True,
         )
 
-        s3_bucket.add_cors_rule(
-            allowed_methods=[aws_s3.HttpMethods.GET, aws_s3.HttpMethods.HEAD],
-            allowed_headers=["*"],
-            allowed_origins=["*"],
-            max_age=3600,
-        )
-
         return s3_bucket
 
     def create_cloudfront_distribution(self):
@@ -42,3 +37,23 @@ class CdkS3CloudfrontExampleStack(Stack):
         )
 
         return cloudfront_distribution
+
+    def create_ssm_string_param(self):
+        ssm_name = '/output/s3-cloudfront-stack'
+
+        ssm_string_param = aws_ssm.StringParameter(
+            self,
+            'SsmStringParam',
+            parameter_name=ssm_name,
+            string_value=json.dumps(
+                {
+                    's3_bucket_name': self.s3_bucket.bucket_name,
+                    'cloudfront_distribution_id': self.cloudfront_distribution.distribution_id,
+                }
+            ),
+            tier=aws_ssm.ParameterTier.STANDARD,
+        )
+
+        ssm_string_param.apply_removal_policy(RemovalPolicy.DESTROY)
+
+        return ssm_string_param
